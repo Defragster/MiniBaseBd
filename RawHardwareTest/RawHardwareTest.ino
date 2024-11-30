@@ -447,6 +447,18 @@ const char * id2chip(const unsigned char *id)
 			if (id[2] == 0x43) return "SST26VF064";
 		}
 	}
+   if (id[0] == 0xEF) {
+    // Winbond
+    if (id[1] == 0x40) {
+      if (id[2] == 0x14) return "W25Q80BV";
+      if (id[2] == 0x15) return "W25Q16DV";
+      if (id[2] == 0x17) return "W25Q64FV";
+      if (id[2] == 0x18) return "W25Q128FV";
+      if (id[2] == 0x19) return "W25Q256FV";
+      if (id[2] == 0x20) return "W25Q512JV";
+      if (id[2] == 0x21) return "W25Q01JV";
+    }
+  }
   	if (id[0] == 0x1F) {
     		// Adesto
    		if (id[1] == 0x89) {
