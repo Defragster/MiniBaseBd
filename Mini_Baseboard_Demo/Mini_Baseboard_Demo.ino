@@ -28,7 +28,7 @@
 #include "LittleFS.h"
 extern "C" uint8_t external_psram_size;
 
-#define THIS_GOOD
+// #define THIS_GOOD // Activate the SerialFlash chip
 
 // Setup from audio library
 AudioPlaySdWav playSdWav1;
@@ -99,7 +99,7 @@ void setup() {
   //SPI1.setSCK(27);
   SPI1.setMISO(39);
   SPI1.setCS(37);
-//  SPI1.begin();
+  //  SPI1.begin();
 
   // Setup LCD screen
   tft.begin();
@@ -143,11 +143,11 @@ void setup() {
     tft.printf("No Teensy Flash Installed\n");
   }
   tft.println();
-  
- #ifdef THIS_GOOD
-  // XXXX   /* 
+
+#ifdef THIS_GOOD
+  // XXXX   /*
   // This commented section kills touch when SerialFlash.begin is executed
-  // 
+  //
   // Check for NOR Flash on baseboard
   if (!SerialFlash.begin(SPI1, FLASH_CS)) {
     Serial.println(F("Unable to access SPI Flash chip"));
@@ -175,15 +175,14 @@ void setup() {
     tft.printf("SPI NOR Flash Memory Size = %d Mbyte\n", sizeFlash / 1000000 * 8);
   }
   tft.println();
-#endif // XXXXX */  
+#endif  // XXXXX */
 
   // Check for SD card installed
   if (!(SD.begin(SDCARD_CS_PIN))) {
     Serial.println("SD card not found");
     tft.println("SD card not found");
     audioAdapterAttached = false;
-  } 
-  else {
+  } else {
     Serial.println("SD card is installed");
     tft.println("SD card is installed");
     audioAdapterAttached = true;
@@ -199,8 +198,7 @@ void setup() {
       esp32Attached = true;
       Serial.println("ESP32 was found");
       tft.println("ESP32 was found");
-    } 
-    else {  // No response or invalid response
+    } else {  // No response or invalid response
       Serial.println("ESP32 not found");
       tft.println("ESP32 not found");
       esp32Attached = false;
@@ -216,8 +214,7 @@ void setup() {
     AudioMemory(8);
     sgtl5000_1.enable();
     sgtl5000_1.volume(0.5);
-  } 
-  else {  // If no audio, gray out button
+  } else {  // If no audio, gray out button
     tft.setCursor(AUDIO_X + 8, AUDIO_Y + 8);
     tft.setFont(BUTTON_FONT);
     tft.setTextColor(ILI9341_WHITE);
@@ -243,12 +240,14 @@ void loop() {
     SetAudioButton(false);
     Serial.println("Audio finished playing");
   }
-  
+
   // Check to see if the touch screen has been touched
   TS_Point p;
   if (ts.touched())
     p = ts.getPoint();
-  if (ts.touched() && isTouched == false) {
+  else
+    p.x = 0;
+  if (p.x && isTouched == false) {
     // Map the touch point to the LCD screen
     p.x = map(p.x, TS_MINY, TS_MAXY, 0, tft.width());
     p.y = map(p.y, TS_MINX, TS_MAXX, 0, tft.height());
@@ -273,7 +272,7 @@ void loop() {
       }
     }
   }
-    if (ts.touched() ) {
+  if (p.x) {
     Serial.print("x = ");  // Show our touch coordinates for each touch
     Serial.print(p.x);
     Serial.print(", y = ");
@@ -281,7 +280,7 @@ void loop() {
     Serial.println();
     delay(100);  // Debounce touchscreen a bit
   }
-  
+
   if (!ts.touched() && isTouched) {
     isTouched = false;  // touchscreen is no longer being touched, reset flag
   }
@@ -306,6 +305,7 @@ void SetAudioButton(boolean audio) {
   tft.setCursor(AUDIO_X + 8, AUDIO_Y + 8);
   tft.setFont(BUTTON_FONT);
   tft.setTextColor(ILI9341_WHITE);
+  static char WavNum = '2';
 
   if (!audio) {  // button is set inactive, redraw button inactive
     tft.fillRoundRect(AUDIO_X, AUDIO_Y, AUDIO_W, AUDIO_H, 4, ILI9341_RED);
@@ -321,7 +321,11 @@ void SetAudioButton(boolean audio) {
     audioPlaying = true;
     if (audioAdapterAttached && !playSdWav1.isPlaying()) {  // Play audio file
       Serial.println("Audio being played");
-      playSdWav1.play("SDTEST2.WAV");
+      char szWav[32];
+      sprintf( szWav, "SDTEST%c.WAV", WavNum);
+      WavNum++;
+      if ( WavNum>'4') WavNum='1';
+      playSdWav1.play(szWav);
       delay(10);  // wait for library to parse WAV info
     }
   }

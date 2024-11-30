@@ -28,7 +28,7 @@
 #include "LittleFS.h"
 extern "C" uint8_t external_psram_size;
 
-// #define THIS_GOOD // Activate the SerialFlash chip
+#define THIS_GOOD // Activate the SerialFlash chip
 
 // Setup from audio library
 AudioPlaySdWav playSdWav1;
