@@ -49,6 +49,7 @@ AudioControlSGTL5000 sgtl5000_1;
 // LCD control pins defined by the baseboard
 #define TFT_CS 40
 #define TFT_DC 9
+#define TIRQ_PIN 2
 
 // Use main SPI bus MOSI=11, MISO=12, SCK=13 with different control pins
 ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC);
@@ -57,7 +58,7 @@ ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC);
 // TIRQ interrupt if used is on pin 2
 #define TS_CS 41
 //#define TIRQ_PIN  2
-XPT2046_Touchscreen ts(TS_CS);  // Param 2 = NULL - No interrupts
+XPT2046_Touchscreen ts(TS_CS, TIRQ_PIN);  // Param 2 = NULL - No interrupts
 
 // Define Audio button location and size
 #define AUDIO_X 10
@@ -175,7 +176,7 @@ void setup() {
     tft.printf("SPI NOR Flash Memory Size = %d Mbyte\n", sizeFlash / 1000000 * 8);
   }
   tft.println();
-#endif  // XXXXX */
+#endif                  // XXXXX */
 
   // Check for SD card installed
   if (!(SD.begin(SDCARD_CS_PIN))) {
@@ -203,6 +204,7 @@ void setup() {
       tft.println("ESP32 not found");
       esp32Attached = false;
     }
+    Serial.print("\tUSB input like Touch: 'a'udio or 's'can ");
   }
 
   // Draw buttons
@@ -243,10 +245,11 @@ void loop() {
 
   // Check to see if the touch screen has been touched
   TS_Point p;
-  if (ts.touched())
-    p = ts.getPoint();
-  else
-    p.x = 0;
+  p.x = 0; // signal no touch
+  if (ts.tirqTouched()) {
+    if (ts.touched())
+      p = ts.getPoint();
+  }
   if (p.x && isTouched == false) {
     // Map the touch point to the LCD screen
     p.x = map(p.x, TS_MINY, TS_MAXY, 0, tft.width());
@@ -272,7 +275,7 @@ void loop() {
       }
     }
   }
-  if (p.x && p.x <3000) {
+  if (p.x && p.x < 3000) {
     Serial.print("x = ");  // Show our touch coordinates for each touch
     Serial.print(p.x);
     Serial.print(", y = ");
@@ -297,7 +300,7 @@ void loop() {
     scanRequested = false;  // Reset the scan flag and button
     SetScanButton(false);
   }
-  checkUSB(); // Confirm full function when Touch fails
+  checkUSB();  // Confirm full function when Touch fails
 }
 void checkUSB() {
 
