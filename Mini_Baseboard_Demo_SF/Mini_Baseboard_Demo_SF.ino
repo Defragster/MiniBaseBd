@@ -28,7 +28,7 @@
 #include "LittleFS.h"
 extern "C" uint8_t external_psram_size;
 
-#define THIS_GOOD // Activate the SerialFlash chip
+#define THIS_GOOD  // Activate the SerialFlash chip
 
 // Setup from audio library
 AudioPlaySdWav playSdWav1;
@@ -272,7 +272,7 @@ void loop() {
       }
     }
   }
-  if (p.x) {
+  if (p.x && p.x <3000) {
     Serial.print("x = ");  // Show our touch coordinates for each touch
     Serial.print(p.x);
     Serial.print(", y = ");
@@ -297,7 +297,32 @@ void loop() {
     scanRequested = false;  // Reset the scan flag and button
     SetScanButton(false);
   }
+  checkUSB(); // Confirm full function when Touch fails
 }
+void checkUSB() {
+
+  if (Serial.available()) {
+    char inC;
+    while (Serial.available()) {
+      inC = Serial.read();
+      switch (inC) {
+        case 'a':
+          Serial.println("Audio Button Hit");
+          if (audioAdapterAttached && !audioPlaying) {
+            SetAudioButton(true);
+          } else if (audioAdapterAttached && audioPlaying) {
+            SetAudioButton(false);
+          }
+          break;
+        case 's':
+          Serial.println("Scan Button Hit");
+          if (esp32Attached) SetScanButton(true);
+          break;
+      }
+    }
+  }
+}
+
 //===============================================================================
 //  Routine to draw Audio button current state and control audio playback
 //===============================================================================
@@ -322,9 +347,9 @@ void SetAudioButton(boolean audio) {
     if (audioAdapterAttached && !playSdWav1.isPlaying()) {  // Play audio file
       Serial.println("Audio being played");
       char szWav[32];
-      sprintf( szWav, "SDTEST%c.WAV", WavNum);
+      sprintf(szWav, "SDTEST%c.WAV", WavNum);
       WavNum++;
-      if ( WavNum>'4') WavNum='1';
+      if (WavNum > '4') WavNum = '1';
       playSdWav1.play(szWav);
       delay(10);  // wait for library to parse WAV info
     }
