@@ -56,7 +56,7 @@ ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC);
 
 // Touch screen control pins defined by the baseboard
 // TIRQ interrupt if used is on pin 2
-#define TS_CS 41
+#define TS_CS 14 // 24 // 41
 //#define TIRQ_PIN  2
 XPT2046_Touchscreen ts(TS_CS, TIRQ_PIN);  // Param 2 = NULL - No interrupts
 
@@ -215,7 +215,7 @@ void setup() {
   if (audioAdapterAttached) {  // Setup the audio
     AudioMemory(8);
     sgtl5000_1.enable();
-    sgtl5000_1.volume(0.5);
+    sgtl5000_1.volume(0.3);
   } else {  // If no audio, gray out button
     tft.setCursor(AUDIO_X + 8, AUDIO_Y + 8);
     tft.setFont(BUTTON_FONT);
@@ -348,9 +348,10 @@ void SetAudioButton(boolean audio) {
     tft.print("Playing");
     audioPlaying = true;
     if (audioAdapterAttached && !playSdWav1.isPlaying()) {  // Play audio file
-      Serial.println("Audio being played");
+      Serial.print("Audio being played: ");
       char szWav[32];
       sprintf(szWav, "SDTEST%c.WAV", WavNum);
+      Serial.println(szWav);
       WavNum++;
       if (WavNum > '4') WavNum = '1';
       playSdWav1.play(szWav);
