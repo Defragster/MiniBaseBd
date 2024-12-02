@@ -25,7 +25,7 @@ ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC);
 // Touch screen control pins defined by the baseboard
 // TIRQ interrupt if used is on pin 2
 #define TS_CS 14  // 24 // 41
-//#define TIRQ_PIN  2
+#define TIRQ_PIN 2
 XPT2046_Touchscreen ts(TS_CS, TIRQ_PIN);  // Param 2 = NULL - No interrupts
 
 void setup() {
@@ -102,6 +102,26 @@ void spaces(int num) {
 }
 
 void loop() {
+  TS_Point p;
+  p.x = 0;  // signal no touch
+  if (ts.tirqTouched()) {
+    if (ts.touched())
+      p = ts.getPoint();
+    else
+      Serial.println("T_IRQ");
+  }
+
+
+  if (p.x && p.x < 3000) {
+    p.x = map(p.x, TS_MINY, TS_MAXY, 0, tft.width());
+    p.y = map(p.y, TS_MINX, TS_MAXX, 0, tft.height());
+    Serial.print("x = ");  // Show our touch coordinates for each touch
+    Serial.print(p.x);
+    Serial.print(", y = ");
+    Serial.print(p.y);
+    Serial.println();
+    delay(100);  // Debounce touchscreen a bit
+  }
 }
 
 void error(const char *message) {
