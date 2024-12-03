@@ -49,12 +49,13 @@ void setup() {
   //SPI1.setMOSI(26);
   //SPI1.setSCK(27);
   SPI1.setMISO(39);
-  SPI1.setCS(37);
+  SPI1.setCS(FLASH_CS);
   // SerialFlash.begin(FlashChipSelect); // proceed even if begin() fails
     if (!SerialFlash.begin(SPI1, FLASH_CS)) {
     Serial.println(F("Unable to access SPI Flash chip"));
   }
 
+// SerialFlash.eraseAll();
 
   if (test()) {
     Serial.println();
