@@ -4,7 +4,8 @@
 #include <font_Arial.h>
 #include <XPT2046_Touchscreen.h>
 
-const int FlashChipSelect = 37;  // digital pin for flash chip CS pin
+const int FlashChipSelect = 38; // xx 37;  // digital pin for flash chip CS pin
+//const int FlashChipSelect = 37;  // digital pin for flash chip CS pin
 //const int FlashChipSelect = 6; // digital pin for flash chip CS pin
 //const int FlashChipSelect = 21; // Arduino 101 built-in SPI Flash
 

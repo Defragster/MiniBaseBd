@@ -108,13 +108,7 @@ void setup() {
     //  tft.printf("Flash Mfr Code EF = ID: %02X %02X %02X\n", id[0], id[1], id[2]);
     tft.printf("SPI NOR Flash Memory Size = %d Mbyte\n", sizeFlash / 1000000 * 8);
   }
-  tft.println();
-  tft.setFont(Arial_14);
-  tft.printf("CAN'T TOUCH THIS!");
-  tft.println();
-  tft.setTextColor(ILI9341_RED);
-  tft.printf("CAN'T TOUCH THIS!");
-  tft.println();
+  ListFiles();
 #endif  // XXXXX */
 
   audioAdapterAttached = true;  // fake this to enable touch button
@@ -173,8 +167,8 @@ void loop() {
     Serial.print(p.y);
     Serial.println();
 
-    tft.fillRect(1, SCAN_Y + SCAN_H, 360, 240, ILI9341_BLUE);  // Clear previous scan
-    tft.setCursor(1, 100);
+    tft.fillRect(1, SCAN_Y + SCAN_H, 360, 24, ILI9341_BLUE);  // Clear previous scan
+    tft.setCursor(1, 90);
     tft.setFont(BUTTON_FONT);
     tft.setTextColor(ILI9341_WHITE);
     tft.print("x = ");  // Show our touch coordinates for each touch
@@ -262,4 +256,54 @@ void SetScanButton(boolean scanning) {
     Serial.println("Scan being requested");
   }
   delay(1000);  // wait for library to parse WAV info
+  ListFiles();
+}
+
+void spaces(int num) {
+  for (int i = 0; i < num; i++) {
+    Serial.print(' ');
+  }
+  for (int i = 0; i < num; i++) {
+    tft.print(' ');
+  }
+}
+
+void ListFiles() {
+#ifdef THIS_GOOD
+  tft.fillRect(1, SCAN_Y + SCAN_H, 360, 240, ILI9341_BLUE);  // Clear previous scan
+  tft.setCursor(1, 120);
+  tft.setFont(Arial_14);
+  tft.printf("CAN'T TOUCH THIS!");
+  tft.setFont(Arial_8);
+  tft.setTextColor(ILI9341_RED);
+  tft.printf("CAN'T TOUCH THIS!");
+  tft.setTextColor(ILI9341_WHITE);
+  SerialFlash.opendir();
+  uint32_t fCnt = 0;
+  tft.println("\n");
+  while (1) {
+    char filename[64];
+    uint32_t filesize;
+    if (SerialFlash.readdir(filename, sizeof(filename), filesize)) {
+      tft.printf("  File %d:", fCnt++);
+      Serial.print(F("  "));
+      Serial.print(filename);
+      spaces(20 - strlen(filename));
+      Serial.print(F("  "));
+      Serial.print(filesize);
+      Serial.print(F(" bytes"));
+      Serial.println();
+
+      tft.print(F(" "));
+      tft.print(filename);
+      spaces(20 - strlen(filename));
+      tft.print(F(" "));
+      tft.print(filesize);
+      tft.print(F(" bytes"));
+      tft.println();
+    } else {
+      break;  // no more files
+    }
+  }
+#endif  // XXXXX */
 }
