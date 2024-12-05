@@ -4,8 +4,6 @@
 #include <SPI.h>
 #include <SerialFlash.h>
 
-#define THIS_GOOD  //  USE THIS TO TOGGLE SERFLASH
-
 // touchscreen offset for four corners
 #if 0
 #define TS_MINX 400
@@ -80,10 +78,9 @@ void setup() {
   tft.setCursor(1, 110);  // Set initial cursor position
   tft.setFont(Arial_10);  // Set initial font style and size
 
-#ifdef THIS_GOOD
   // This commented section kills touch when SerialFlash.begin is executed
   // Check for Flash on baseboard
-  if (!SerialFlash.begin(SPI1, FLASH_CS)) {
+if (!SerialFlash.begin(SPI1, FLASH_CS)) {
     Serial.println(F("Unable to access SPI Flash chip"));
     tft.println("Unable to access SPI Flash Chip");
   }
@@ -105,11 +102,10 @@ void setup() {
     Serial.print("Flash Memory has ");
     Serial.print(sizeFlash);
     Serial.println(" bytes");
-    //  tft.printf("Flash Mfr Code EF = ID: %02X %02X %02X\n", id[0], id[1], id[2]);
+    tft.printf("Flash Mfr Code EF = ID: %02X %02X %02X\n", id[0], id[1], id[2]);
     tft.printf("SPI NOR Flash Memory Size = %d Mbyte\n", sizeFlash / 1000000 * 8);
   }
   ListFiles();
-#endif  // XXXXX */
 
   audioAdapterAttached = true;  // fake this to enable touch button
   tft.println();
@@ -167,7 +163,7 @@ void loop() {
     Serial.print(p.y);
     Serial.println();
 
-    tft.fillRect(1, SCAN_Y + SCAN_H, 360, 24, ILI9341_BLUE);  // Clear previous scan
+    tft.fillRect(1, SCAN_Y + SCAN_H, 360, 26, ILI9341_BLUE);  // Clear previous scan
     tft.setCursor(1, 90);
     tft.setFont(BUTTON_FONT);
     tft.setTextColor(ILI9341_WHITE);
@@ -269,14 +265,9 @@ void spaces(int num) {
 }
 
 void ListFiles() {
-#ifdef THIS_GOOD
   tft.fillRect(1, SCAN_Y + SCAN_H, 360, 240, ILI9341_BLUE);  // Clear previous scan
   tft.setCursor(1, 120);
-  tft.setFont(Arial_14);
-  tft.printf("CAN'T TOUCH THIS!");
   tft.setFont(Arial_8);
-  tft.setTextColor(ILI9341_RED);
-  tft.printf("CAN'T TOUCH THIS!");
   tft.setTextColor(ILI9341_WHITE);
   SerialFlash.opendir();
   uint32_t fCnt = 0;
@@ -305,5 +296,4 @@ void ListFiles() {
       break;  // no more files
     }
   }
-#endif  // XXXXX */
 }

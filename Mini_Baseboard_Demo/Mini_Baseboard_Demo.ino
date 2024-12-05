@@ -28,8 +28,6 @@
 #include "LittleFS.h"
 extern "C" uint8_t external_psram_size;
 
-// #define THIS_GOOD // Activate the SerialFlash chip
-
 // Setup from audio library
 AudioPlaySdWav playSdWav1;
 AudioOutputI2S i2s1;
@@ -144,10 +142,6 @@ void setup() {
   }
   tft.println();
 
-#ifdef THIS_GOOD
-  // XXXX   /*
-  // This commented section kills touch when SerialFlash.begin is executed
-  //
   // Check for NOR Flash on baseboard
   if (!SerialFlash.begin(SPI1, FLASH_CS)) {
     Serial.println(F("Unable to access SPI Flash chip"));
@@ -175,7 +169,6 @@ void setup() {
     tft.printf("SPI NOR Flash Memory Size = %d Mbyte\n", sizeFlash / 1000000 * 8);
   }
   tft.println();
-#endif  // XXXXX */
 
   // Check for SD card installed
   if (!(SD.begin(SDCARD_CS_PIN))) {
